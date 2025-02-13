@@ -10,10 +10,8 @@
                 const response = await fetch(`BASES/${file}`);
                 if (!response.ok) throw new Error(`Error al cargar datos: ${response.status}`);
                 
-                const textData = await response.text(); // Obtener el contenido como texto
-                const data = JSON.parse(textData); // Convertir el texto a JSON
-                console.log("Datos cargados:", data); // Depuración en consola
-                
+                const data = await response.json();
+                console.log("Datos cargados:", data);
                 displayData(data);
             } catch (error) {
                 console.error("No se pudieron cargar los datos:", error);
@@ -75,8 +73,8 @@
 </head>
 <body>
     <h1>Base de Datos FUJI</h1>
-    <button onclick="loadDatabase('BASE_FUJI_LED.txt')">Ver Base LED</button>
-    <button onclick="loadDatabase('BASE_FUJI_XENON.txt')">Ver Base XENON</button>
+    <button onclick="loadDatabase('BASE_FUJI_LED.json')">Ver Base LED</button>
+    <button onclick="loadDatabase('BASE_FUJI_XENON.json')">Ver Base XENON</button>
 
     <table>
         <thead>
@@ -96,5 +94,6 @@
     </table>
 </body>
 </html>
+
 
 
