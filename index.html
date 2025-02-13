@@ -9,13 +9,15 @@
 
         async function loadDatabase(database) {
             currentDatabase = database;
-            const url = `BASES/${database === "led" ? "BASE_FUJI_LED.json" : "BASE_FUJI_XENON.json"}`;
+            const url = `BASES/${database === "led" ? "BASE_FUJI_LED.txt" : "BASE_FUJI_XENON.txt"}`;
             
             try {
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`Error al cargar datos: ${response.status}`);
                 
-                const data = await response.json();
+                const text = await response.text(); // Leer como texto plano
+                const data = JSON.parse(text); // Convertir a JSON
+                
                 console.log("Datos cargados:", data); // Depuración en consola
                 displayData(data);
             } catch (error) {
@@ -99,4 +101,3 @@
     </table>
 </body>
 </html>
-
