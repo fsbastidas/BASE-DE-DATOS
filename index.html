@@ -9,7 +9,7 @@
 
         async function loadDatabase(database) {
             currentDatabase = database;
-            const response = await fetch(`BASES/${database === "led" ? "BASE FUJI LED.json" : "BASE FUJI XENON.json"}`);
+            const response = await fetch(`BASES/${database === "led" ? "BASE_FUJI_LED.json" : "BASE_FUJI_XENON.json"}`);
             const data = await response.json();
             displayData(data);
         }
