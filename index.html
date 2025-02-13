@@ -9,9 +9,18 @@
 
         async function loadDatabase(database) {
             currentDatabase = database;
-            const response = await fetch(`BASES/${database === "led" ? "BASE_FUJI_LED.json" : "BASE_FUJI_XENON.json"}`);
-            const data = await response.json();
-            displayData(data);
+            const url = `BASES/${database === "led" ? "BASE_FUJI_LED.json" : "BASE_FUJI_XENON.json"}`;
+            
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`Error al cargar datos: ${response.status}`);
+                
+                const data = await response.json();
+                console.log("Datos cargados:", data); // Depuración en consola
+                displayData(data);
+            } catch (error) {
+                console.error("No se pudieron cargar los datos:", error);
+            }
         }
 
         function displayData(data) {
@@ -19,11 +28,11 @@
             tableBody.innerHTML = "";
             data.forEach((item, index) => {
                 const row = `<tr>
-                    <td>${item.Model}</td>
-                    <td>${item["Customer Name"]}</td>
+                    <td>${item.Model || "N/A"}</td>
+                    <td>${item["Customer Name"] || "N/A"}</td>
                     <td>${item.Territoy || "N/A"}</td>
-                    <td>${item.Address1}</td>
-                    <td>${item.City}</td>
+                    <td>${item.Address1 || "N/A"}</td>
+                    <td>${item.City || "N/A"}</td>
                     <td>${item["Date Sold"] || "N/A"}</td>
                     <td>${item["Date Installed"] || "N/A"}</td>
                     <td><button onclick="deleteRow(${index})">Eliminar</button></td>
@@ -38,8 +47,14 @@
         }
     </script>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
         table {
-            width: 100%;
+            width: 90%;
+            margin: 20px auto;
             border-collapse: collapse;
         }
         th, td {
@@ -48,9 +63,16 @@
             text-align: left;
         }
         button {
-            padding: 8px;
+            padding: 10px;
             margin: 5px;
             cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
