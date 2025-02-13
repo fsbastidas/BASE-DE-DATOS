@@ -4,26 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Base de Datos FUJI</title>
+    <script src="BASES/database.js"></script>
     <script>
-        async function loadDatabase(url) {
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error(`Error al cargar datos: ${response.status}`);
-
-                const text = await response.text();
-                const data = JSON.parse(text);
-                displayData(data);
-            } catch (error) {
-                console.error("No se pudieron cargar los datos:", error);
-            }
-        }
-
-        function loadBaseLED() {
-            loadDatabase("BASES/BASE_FUJI_LED.txt");
-        }
-
-        function loadBaseXENON() {
-            loadDatabase("BASES/BASE_FUJI_XENON.txt");
+        function loadDatabase(database) {
+            let data = database === "led" ? BASE_FUJI_LED : BASE_FUJI_XENON;
+            displayData(data);
         }
 
         function displayData(data) {
@@ -81,8 +66,8 @@
 </head>
 <body>
     <h1>Base de Datos FUJI</h1>
-    <button onclick="loadBaseLED()">Ver Base LED</button>
-    <button onclick="loadBaseXENON()">Ver Base XENON</button>
+    <button onclick="loadDatabase('led')">Ver Base LED</button>
+    <button onclick="loadDatabase('xenon')">Ver Base XENON</button>
 
     <table>
         <thead>
