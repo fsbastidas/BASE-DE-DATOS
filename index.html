@@ -1,1 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base de Datos FUJI</title>
+    <script>
+        let currentDatabase = "led"; // Base de datos activa por defecto
+
+        async function loadDatabase(database) {
+            currentDatabase = database;
+            const response = await fetch(`BASES/${database === "led" ? "BASE FUJI LED.json" : "BASE FUJI XENON.json"}`);
+            const data = await response.json();
+            displayData(data);
+        }
+
+        function displayData(data) {
+            const tableBody = document.getElementById("table-body");
+            tableBody.innerHTML = "";
+            data.forEach((item, index) => {
+                const row = `<tr>
+                    <td>${item.Model}</td>
+                    <td>${item["Customer Name"]}</td>
+                    <td>${item.Territoy || "N/A"}</td>
+                    <td>${item.Address1}</td>
+                    <td>${item.City}</td>
+                    <td>${item["Date Sold"] || "N/A"}</td>
+                    <td>${item["Date Installed"] || "N/A"}</td>
+                    <td><button onclick="deleteRow(${index})">Eliminar</button></td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        function deleteRow(index) {
+            const tableBody = document.getElementById("table-body");
+            tableBody.deleteRow(index);
+        }
+    </script>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        button {
+            padding: 8px;
+            margin: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Base de Datos FUJI</h1>
+    <button onclick="loadDatabase('led')">Ver Base LED</button>
+    <button onclick="loadDatabase('xenon')">Ver Base XENON</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Modelo</th>
+                <th>Cliente</th>
+                <th>Territorio</th>
+                <th>Dirección</th>
+                <th>Ciudad</th>
+                <th>Fecha de Venta</th>
+                <th>Fecha de Instalación</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+        </tbody>
+    </table>
+</body>
+</html>
 
