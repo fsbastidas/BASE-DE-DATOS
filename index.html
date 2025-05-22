@@ -3,61 +3,98 @@
 <head>
   <meta charset="UTF-8">
   <title>Informe de Asistencia Técnica</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body { font-family: Arial; margin: 40px; }
     label, textarea, input { display: block; width: 100%; margin: 10px 0; }
-    textarea { height: 100px; }
-    button { padding: 10px 20px; }
+    textarea { height: 80px; }
+    button { padding: 10px 20px; margin-top: 20px; }
   </style>
 </head>
 <body>
-  <h2>Generar Informe de Asistencia</h2>
-  <form id="informeForm">
+  <h2>Generador de Informe de Asistencia</h2>
+  <form id="formInforme">
     <label>Fecha:</label>
-    <input type="date" name="fecha" required>
+    <input type="date" id="fecha" required>
 
-    <label>Nombre del hospital:</label>
-    <input type="text" name="hospital" required>
+    <label>Hospital:</label>
+    <input type="text" id="hospital" required>
 
     <label>Ciudad:</label>
-    <input type="text" name="ciudad" required>
+    <input type="text" id="ciudad" required>
 
     <label>Marca:</label>
-    <input type="text" name="marca">
+    <input type="text" id="marca">
 
     <label>Modelo:</label>
-    <input type="text" name="modelo">
+    <input type="text" id="modelo">
 
     <label>Serie:</label>
-    <input type="text" name="serie">
+    <input type="text" id="serie">
 
     <label>Descripción del problema:</label>
-    <textarea name="descripcion"></textarea>
+    <textarea id="descripcion"></textarea>
 
     <label>Observaciones:</label>
-    <textarea name="observaciones"></textarea>
+    <textarea id="observaciones"></textarea>
 
     <label>Recomendaciones:</label>
-    <textarea name="recomendaciones"></textarea>
+    <textarea id="recomendaciones"></textarea>
 
     <label>Nombre del técnico:</label>
-    <input type="text" name="tecnico" required>
+    <input type="text" id="tecnico" required>
 
-    <label>Email destinatario:</label>
-    <input type="email" name="correo" required>
-
-    <button type="submit">Enviar Informe</button>
+    <button type="button" onclick="generarPDF()">Descargar Informe PDF</button>
   </form>
 
   <script>
-    document.getElementById('informeForm').addEventListener('submit', async function (e) {
-      e.preventDefault();
-      const datos = new FormData(this);
-      const valores = Object.fromEntries(datos.entries());
+    async function generarPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
 
-      // Aquí podrías hacer un envío a un servidor para generar PDF y mandar email
-      alert("Informe generado y enviado a: " + valores.correo);
-    });
+      const fecha = document.getElementById("fecha").value;
+      const hospital = document.getElementById("hospital").value;
+      const ciudad = document.getElementById("ciudad").value;
+      const marca = document.getElementById("marca").value;
+      const modelo = document.getElementById("modelo").value;
+      const serie = document.getElementById("serie").value;
+      const descripcion = document.getElementById("descripcion").value;
+      const observaciones = document.getElementById("observaciones").value;
+      const recomendaciones = document.getElementById("recomendaciones").value;
+      const tecnico = document.getElementById("tecnico").value;
+
+      let y = 10;
+      doc.setFont("helvetica", "normal");
+      doc.text(`Guayaquil, ${fecha}`, 10, y); y += 10;
+      doc.text("SEÑORES", 10, y); y += 10;
+      doc.text(hospital.toUpperCase(), 10, y); y += 10;
+      doc.text(`${ciudad.toUpperCase()} –`, 10, y); y += 10;
+
+      y += 10;
+      doc.text("INFORME DE ASISTENCIA TÉCNICA", 10, y); y += 10;
+
+      y += 10;
+      doc.text("Detalles del equipo revisado:", 10, y); y += 10;
+      doc.text(`Marca: ${marca}`, 10, y); y += 10;
+      doc.text(`Modelo: ${modelo}`, 10, y); y += 10;
+      doc.text(`Serie: ${serie}`, 10, y); y += 10;
+
+      y += 10;
+      doc.text("Descripción del problema:", 10, y); y += 10;
+      doc.text(doc.splitTextToSize(descripcion, 180), 10, y); y += 10 + (descripcion.length / 80) * 10;
+
+      doc.text("Observaciones:", 10, y); y += 10;
+      doc.text(doc.splitTextToSize(observaciones, 180), 10, y); y += 10 + (observaciones.length / 80) * 10;
+
+      doc.text("Recomendaciones:", 10, y); y += 10;
+      doc.text(doc.splitTextToSize(recomendaciones, 180), 10, y); y += 10 + (recomendaciones.length / 80) * 10;
+
+      y += 10;
+      doc.text("ATENTAMENTE,", 10, y); y += 20;
+      doc.text(tecnico, 10, y);
+
+      doc.save("informe_asistencia.pdf");
+    }
   </script>
 </body>
 </html>
