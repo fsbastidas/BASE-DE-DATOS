@@ -2,26 +2,33 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Informe de Asistencia Técnica</title>
+  <title>Generador de Informe con Imágenes</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    body { font-family: Arial; margin: 40px; }
-    label, textarea, input { display: block; width: 100%; margin: 10px 0; }
-    textarea { height: 80px; }
+    body { font-family: Arial, sans-serif; margin: 30px; }
+    input, textarea { width: 100%; margin: 10px 0; padding: 8px; }
+    label { font-weight: bold; margin-top: 10px; display: block; }
     button { padding: 10px 20px; margin-top: 20px; }
   </style>
 </head>
 <body>
-  <h2>Generador de Informe de Asistencia</h2>
+  <h2>Generador de Informe Técnico</h2>
+
   <form id="formInforme">
+    <label>Logo (opcional):</label>
+    <input type="file" id="logoInput" accept="image/*">
+
+    <label>Firma (opcional):</label>
+    <input type="file" id="firmaInput" accept="image/*">
+
     <label>Fecha:</label>
     <input type="date" id="fecha" required>
 
-    <label>Hospital:</label>
+    <label>Nombre del Hospital:</label>
     <input type="text" id="hospital" required>
 
-    <label>Ciudad:</label>
-    <input type="text" id="ciudad" required>
+    <label>Título del Informe:</label>
+    <input type="text" id="titulo" required>
 
     <label>Marca:</label>
     <input type="text" id="marca">
@@ -48,13 +55,24 @@
   </form>
 
   <script>
+    async function cargarImagenComoBase64(fileInput) {
+      return new Promise((resolve, reject) => {
+        const file = fileInput.files[0];
+        if (!file) return resolve(null);
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
     async function generarPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
       const fecha = document.getElementById("fecha").value;
       const hospital = document.getElementById("hospital").value;
-      const ciudad = document.getElementById("ciudad").value;
+      const titulo = document.getElementById("titulo").value;
       const marca = document.getElementById("marca").value;
       const modelo = document.getElementById("modelo").value;
       const serie = document.getElementById("serie").value;
@@ -63,35 +81,51 @@
       const recomendaciones = document.getElementById("recomendaciones").value;
       const tecnico = document.getElementById("tecnico").value;
 
+      const logoBase64 = await cargarImagenComoBase64(document.getElementById("logoInput"));
+      const firmaBase64 = await cargarImagenComoBase64(document.getElementById("firmaInput"));
+
       let y = 10;
-      doc.setFont("helvetica", "normal");
-      doc.text(`Guayaquil, ${fecha}`, 10, y); y += 10;
-      doc.text("SEÑORES", 10, y); y += 10;
-      doc.text(hospital.toUpperCase(), 10, y); y += 10;
-      doc.text(`${ciudad.toUpperCase()} –`, 10, y); y += 10;
 
-      y += 10;
-      doc.text("INFORME DE ASISTENCIA TÉCNICA", 10, y); y += 10;
+      if (logoBase64) {
+        doc.addImage(logoBase64, "PNG", 10, y, 40, 20);
+      }
 
-      y += 10;
-      doc.text("Detalles del equipo revisado:", 10, y); y += 10;
-      doc.text(`Marca: ${marca}`, 10, y); y += 10;
-      doc.text(`Modelo: ${modelo}`, 10, y); y += 10;
-      doc.text(`Serie: ${serie}`, 10, y); y += 10;
+      y += 30;
+      doc.setFontSize(11);
+      doc.text(`Guayaquil, ${fecha}`, 150, y, { align: 'right' }); y += 10;
 
-      y += 10;
-      doc.text("Descripción del problema:", 10, y); y += 10;
-      doc.text(doc.splitTextToSize(descripcion, 180), 10, y); y += 10 + (descripcion.length / 80) * 10;
+      doc.text("SEÑORES", 10, y); y += 8;
+      doc.text(hospital.toUpperCase(), 10, y); y += 8;
+      doc.text("GUAYAQUIL –", 10, y); y += 12;
 
-      doc.text("Observaciones:", 10, y); y += 10;
-      doc.text(doc.splitTextToSize(observaciones, 180), 10, y); y += 10 + (observaciones.length / 80) * 10;
+      doc.setFontSize(13);
+      doc.text(`INFORME ${titulo.toUpperCase()}`, 105, y, { align: 'center' }); y += 15;
 
-      doc.text("Recomendaciones:", 10, y); y += 10;
-      doc.text(doc.splitTextToSize(recomendaciones, 180), 10, y); y += 10 + (recomendaciones.length / 80) * 10;
+      doc.setFontSize(11);
+      doc.text("Detalles del equipo:", 10, y); y += 8;
+      doc.text(`Marca: ${marca}`, 10, y); y += 8;
+      doc.text(`Modelo: ${modelo}`, 10, y); y += 8;
+      doc.text(`Serie: ${serie}`, 10, y); y += 12;
 
-      y += 10;
+      doc.text("Descripción del problema:", 10, y); y += 8;
+      doc.text(doc.splitTextToSize(descripcion, 180), 10, y); y += 10 + (descripcion.length / 80) * 5;
+
+      doc.text("Observaciones:", 10, y); y += 8;
+      doc.text(doc.splitTextToSize(observaciones, 180), 10, y); y += 10 + (observaciones.length / 80) * 5;
+
+      doc.setFont(undefined, 'bold');
+      doc.text("RECOMENDACIONES:", 10, y); y += 8;
+      doc.setFont(undefined, 'normal');
+      doc.text(doc.splitTextToSize(recomendaciones, 180), 10, y); y += 10 + (recomendaciones.length / 80) * 5;
+
+      y += 15;
       doc.text("ATENTAMENTE,", 10, y); y += 20;
-      doc.text(tecnico, 10, y);
+
+      if (firmaBase64) {
+        doc.addImage(firmaBase64, "PNG", 10, y, 40, 20); y += 25;
+      }
+
+      doc.text(tecnico.toUpperCase(), 10, y);
 
       doc.save("informe_asistencia.pdf");
     }
